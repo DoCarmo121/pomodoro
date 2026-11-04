@@ -1,0 +1,56 @@
+/* Estilos de layout principal */
+.app-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+.app-header {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.app-header h1 {
+  font-size: 1.8rem;
+  color: #1f2937;
+}
+
+.app-main-layout {
+  display: flex;
+  gap: 2rem;
+  flex: 1;
+}
+
+.temporizador-secao {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background: #ffffff;
+  padding: 2rem;
+  border-radius: 12px;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+.tarefas-secao {
+  width: 380px;
+  background: #ffffff;
+  padding: 1.5rem;
+  border-radius: 12px;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+/* Responsividade: em telas menores que 850px, o painel de tarefas vai para baixo */
+@media (max-width: 850px) {
+  .app-main-layout {
+    flex-direction: column;
+  }
+
+  .tarefas-secao {
+    width: 100%;
+  }
+}
+
