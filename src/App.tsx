@@ -25,6 +25,7 @@ import {
   reiniciarCiclos,
   calcularTempoRestanteMs,
   obterDuracaoFaseMs,
+  recalcularSessaoAposInatividade,
 } from './domain';
 import { inicializarAudio, tocarAlertaSonoro } from './utils';
 import { PainelTarefas } from './components/tarefas';
@@ -33,6 +34,7 @@ import {
   DisplayTemporizador,
   ControlesSessao,
   SeletorPresets,
+  BannerSessaoRetomada,
 } from './components/temporizador';
 import './App.css';
 
@@ -46,10 +48,20 @@ export const App: React.FC = () => {
     return salvos[0]?.id ?? '';
   });
 
-  // ===== Estado da Sessão Ativa (Fase 7) =====
-  const [sessaoAtiva, setSessaoAtiva] = useState<SessaoAtiva | null>(() =>
-    obterSessaoAtiva()
-  );
+  // ===== Estado da Sessão Ativa (Fase 7 e Fase 8) =====
+  // RF-12, UC10: Ao carregar a aplicação, restaura a sessão e recalcula por timestamps (RN-06, RN-07, RN-08)
+  const [sessaoAtiva, setSessaoAtiva] = useState<SessaoAtiva | null>(() => {
+    const salva = obterSessaoAtiva();
+    if (!salva) return null;
+    const recalculo = recalcularSessaoAposInatividade(salva, Date.now());
+    salvarSessaoAtiva(recalculo);
+    return recalculo;
+  });
+
+  // Flag para exibição do Banner de Sessão Retomada (RF-13, UC11)
+  const [sessaoRetomada, setSessaoRetomada] = useState<boolean>(() => {
+    return obterSessaoAtiva() !== null;
+  });
 
   // Preset selecionado atualmente
   const presetSelecionado = useMemo(() => {
@@ -126,6 +138,7 @@ export const App: React.FC = () => {
   // RF-05, UC04: Iniciar Sessão com snapshot imutável (RN-05)
   const handleIniciarSessao = useCallback(() => {
     inicializarAudio(); // Destrava o áudio no clique do usuário (R-01)
+    setSessaoRetomada(false);
     const agora = Date.now();
     const nova = iniciarNovaSessao(presetSelecionado, agora);
     setSessaoAtiva(nova);
@@ -172,6 +185,15 @@ export const App: React.FC = () => {
   const handleEncerrarSessao = useCallback(() => {
     limparSessaoAtiva();
     setSessaoAtiva(null);
+    setSessaoRetomada(false);
+    setTempoRestanteMs(presetSelecionado.tempoFocoMin * 60 * 1000);
+  }, [presetSelecionado]);
+
+  // RF-13, UC11: Descartar sessão retomada sem contabilizar progresso (libera preset para edição/exclusão)
+  const handleDescartarSessaoRetomada = useCallback(() => {
+    limparSessaoAtiva();
+    setSessaoAtiva(null);
+    setSessaoRetomada(false);
     setTempoRestanteMs(presetSelecionado.tempoFocoMin * 60 * 1000);
   }, [presetSelecionado]);
 
@@ -179,6 +201,7 @@ export const App: React.FC = () => {
   const handleTrocarPreset = useCallback(
     (novoPreset: TemporizadorPersonalizado) => {
       setPresetSelecionadoId(novoPreset.id);
+      setSessaoRetomada(false);
 
       // RN-02: Se houver sessão ativa em andamento ou pausada, encerra automaticamente e inicia nova sessão
       if (sessaoAtiva && sessaoAtiva.status !== 'concluida') {
@@ -324,6 +347,19 @@ export const App: React.FC = () => {
       <main className="app-main-layout">
         {/* Seção Principal: Temporizador, Controles e Presets */}
         <section className="temporizador-secao" aria-label="Temporizador de Foco">
+          {/* Banner de Sessão Retomada Automaticamente (RF-12, RF-13, UC10, UC11) */}
+          {sessaoAtiva && (
+            <BannerSessaoRetomada
+              aberto={sessaoRetomada}
+              statusSessao={sessaoAtiva.status}
+              faseAtual={sessaoAtiva.faseAtual}
+              cicloAtual={sessaoAtiva.cicloAtual}
+              nomePreset={sessaoAtiva.snapshotPreset.nome}
+              aoContinuar={() => setSessaoRetomada(false)}
+              aoDescartar={handleDescartarSessaoRetomada}
+            />
+          )}
+
           {/* Seletor Rápido de Presets (RF-11, UC09, RN-02) */}
           <SeletorPresets
             presets={presets}
