@@ -342,6 +342,9 @@ export const App: React.FC = () => {
     <div className="app-container">
       <header className="app-header">
         <h1>Gestão de Foco (Pomodoro)</h1>
+        <p className="app-subtitulo">
+          Ciclos de estudo personalizados e gerenciamento de tarefas
+        </p>
       </header>
 
       <main className="app-main-layout">
@@ -402,8 +405,8 @@ export const App: React.FC = () => {
           />
         </section>
 
-        {/* Seção Lateral Direita: Tarefas de Estudo (RF-15 a RF-19, UC12 a UC15, RN-10) */}
-        <div className="tarefas-secao">
+        {/* Seção Lateral Direita: Tarefas de Estudo (RF-18, UC15, RN-10) */}
+        <aside className="tarefas-secao" aria-label="Painel de Tarefas">
           <PainelTarefas
             tarefas={tarefas}
             aoCriarTarefa={handleCriarTarefa}
@@ -411,8 +414,12 @@ export const App: React.FC = () => {
             aoExcluirTarefa={handleExcluirTarefa}
             aoMudarEstadoTarefa={handleMudarEstadoTarefa}
           />
-        </div>
+        </aside>
       </main>
+
+      <footer className="app-footer">
+        <p>Aplicação Web de Gestão de Foco • Desenvolvido com React e TypeScript</p>
+      </footer>
     </div>
   );
 };

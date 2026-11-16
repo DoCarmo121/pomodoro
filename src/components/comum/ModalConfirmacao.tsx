@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useRef } from 'react';
 
 export interface ModalConfirmacaoProps {
   aberto: boolean;
@@ -11,6 +11,11 @@ export interface ModalConfirmacaoProps {
   aoCancelar: () => void;
 }
 
+/**
+ * Componente de Modal de Confirmação Reutilizável (CP 9.1, RF-20, RN-11, RNF-07).
+ * Utilizado para confirmação explícita em exclusões e operações destrutivas.
+ * Possui acessibilidade total por teclado (Escape para fechar, foco inicial e navegação Tab em ciclo).
+ */
 export const ModalConfirmacao: React.FC<ModalConfirmacaoProps> = ({
   aberto,
   titulo,
@@ -21,15 +26,53 @@ export const ModalConfirmacao: React.FC<ModalConfirmacaoProps> = ({
   aoConfirmar,
   aoCancelar,
 }) => {
-  // Fecha o modal ao pressionar a tecla ESC (RNF-07)
+  const botaoCancelarRef = useRef<HTMLButtonElement>(null);
+  const conteudoRef = useRef<HTMLDivElement>(null);
+
+  // Foco inicial e navegação por teclado (RNF-07)
   useEffect(() => {
-    const lidarComTecla = (e: KeyboardEvent) => {
-      if (e.key === 'Escape' && aberto) {
+    if (!aberto) return;
+
+    // Foca o botão de cancelar por padrão para evitar confirmações acidentais
+    const timer = setTimeout(() => {
+      botaoCancelarRef.current?.focus();
+    }, 50);
+
+    const lidarComTeclas = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
         aoCancelar();
+        return;
+      }
+
+      // Ciclo de foco (Focus Trap) dentro do modal
+      if (e.key === 'Tab' && conteudoRef.current) {
+        const elementosFocaveis = conteudoRef.current.querySelectorAll<HTMLElement>(
+          'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+        );
+        if (elementosFocaveis.length === 0) return;
+
+        const primeiroElemento = elementosFocaveis[0];
+        const ultimoElemento = elementosFocaveis[elementosFocaveis.length - 1];
+
+        if (e.shiftKey) {
+          if (document.activeElement === primeiroElemento) {
+            e.preventDefault();
+            ultimoElemento.focus();
+          }
+        } else {
+          if (document.activeElement === ultimoElemento) {
+            e.preventDefault();
+            primeiroElemento.focus();
+          }
+        }
       }
     };
-    window.addEventListener('keydown', lidarComTecla);
-    return () => window.removeEventListener('keydown', lidarComTecla);
+
+    window.addEventListener('keydown', lidarComTeclas);
+    return () => {
+      clearTimeout(timer);
+      window.removeEventListener('keydown', lidarComTeclas);
+    };
   }, [aberto, aoCancelar]);
 
   if (!aberto) return null;
@@ -37,18 +80,28 @@ export const ModalConfirmacao: React.FC<ModalConfirmacaoProps> = ({
   return (
     <div
       className="modal-overlay"
-      role="dialog"
+      role="alertdialog"
       aria-modal="true"
       aria-labelledby="modal-confirmacao-titulo"
+      aria-describedby="modal-confirmacao-mensagem"
+      onClick={(e) => {
+        // Clicar fora da caixa fecha o modal
+        if (e.target === e.currentTarget) {
+          aoCancelar();
+        }
+      }}
     >
-      <div className="modal-conteudo">
+      <div className="modal-conteudo" ref={conteudoRef}>
         <h3 id="modal-confirmacao-titulo" className="modal-titulo">
           {titulo}
         </h3>
-        <p className="modal-mensagem">{mensagem}</p>
+        <p id="modal-confirmacao-mensagem" className="modal-mensagem">
+          {mensagem}
+        </p>
 
         <div className="modal-acoes">
           <button
+            ref={botaoCancelarRef}
             type="button"
             className="btn btn-secundario"
             onClick={aoCancelar}
@@ -67,4 +120,3 @@ export const ModalConfirmacao: React.FC<ModalConfirmacaoProps> = ({
     </div>
   );
 };
-

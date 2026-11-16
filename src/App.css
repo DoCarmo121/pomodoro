@@ -14,8 +14,16 @@
 }
 
 .app-header h1 {
-  font-size: 1.8rem;
-  color: #1f2937;
+  font-size: 2rem;
+  font-weight: 700;
+  color: #0f172a;
+  letter-spacing: -0.025em;
+}
+
+.app-subtitulo {
+  font-size: 0.95rem;
+  color: #64748b;
+  margin-top: 0.35rem;
 }
 
 .app-main-layout {
@@ -32,27 +40,86 @@
   align-items: center;
   background: #ffffff;
   padding: 2rem;
-  border-radius: 12px;
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.08);
+  border-radius: 14px;
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -2px rgba(0, 0, 0, 0.05);
 }
 
 .tarefas-secao {
   width: 380px;
   background: #ffffff;
   padding: 1.5rem;
-  border-radius: 12px;
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.08);
+  border-radius: 14px;
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -2px rgba(0, 0, 0, 0.05);
 }
 
-/* Responsividade: em telas menores que 850px, o painel de tarefas reorganiza para baixo */
+/* CP 10.1: Desktop layout com painel de tarefas fixado/sticky lateral à direita (RF-18, UC15) */
+@media (min-width: 851px) {
+  .tarefas-secao {
+    position: sticky;
+    top: 1.5rem;
+    max-height: calc(100vh - 3rem);
+    display: flex;
+    flex-direction: column;
+  }
+}
+
+/* CP 10.2: Responsividade em telas menores que 850px (RNF-05, UC15) */
 @media (max-width: 850px) {
   .app-main-layout {
     flex-direction: column;
+    gap: 1.5rem;
   }
 
   .tarefas-secao {
     width: 100%;
   }
+
+  .temporizador-secao {
+    padding: 1.5rem 1rem;
+  }
+}
+
+/* CP 10.2: Telas mobile menores (smartphones <= 540px) */
+@media (max-width: 540px) {
+  .app-container {
+    padding: 0.75rem;
+  }
+
+  .app-header h1 {
+    font-size: 1.6rem;
+  }
+
+  .display-relogio {
+    font-size: 3.4rem !important;
+  }
+
+  .btn-lg {
+    width: 100%;
+    padding: 0.75rem 1rem;
+  }
+
+  .controles-botoes-grupo {
+    width: 100%;
+  }
+
+  .controles-botoes-grupo .btn {
+    flex: 1 1 calc(50% - 0.5rem);
+    min-width: 120px;
+  }
+
+  .grid-presets {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+.app-footer {
+  text-align: center;
+  padding: 2rem 0 1rem;
+  color: #94a3b8;
+  font-size: 0.82rem;
+  margin-top: auto;
 }
 
 /* ===== Painel de Tarefas ===== */
@@ -99,6 +166,17 @@
   max-height: 600px;
   overflow-y: auto;
   padding-right: 0.25rem;
+  scrollbar-width: thin;
+  scrollbar-color: #cbd5e1 transparent;
+}
+
+.painel-tarefas-lista::-webkit-scrollbar {
+  width: 6px;
+}
+
+.painel-tarefas-lista::-webkit-scrollbar-thumb {
+  background-color: #cbd5e1;
+  border-radius: 4px;
 }
 
 .painel-tarefas-vazio {
@@ -291,6 +369,17 @@
 
 .btn-perigo:hover {
   background-color: #b91c1c;
+}
+
+/* Indicador de foco acessível por teclado (RNF-07) */
+button:focus-visible,
+.btn:focus-visible,
+.btn-icone:focus-visible,
+.form-input:focus-visible,
+.form-select:focus-visible,
+.select-estado-rapido:focus-visible {
+  outline: 2px solid #2563eb;
+  outline-offset: 2px;
 }
 
 /* ===== Modais ===== */
