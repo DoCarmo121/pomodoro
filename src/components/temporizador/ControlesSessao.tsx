@@ -40,14 +40,17 @@ export const ControlesSessao: React.FC<ControlesSessaoProps> = ({
   return (
     <div className="controles-sessao-container" aria-label="Controles da Sessão de Foco">
       {/* Caso inativo ou concluído: exibe botão principal de Iniciar */}
-      {(!ehSessaoAtiva) && (
+      {!ehSessaoAtiva && (
         <button
           type="button"
           className="btn btn-primario btn-lg btn-iniciar"
           onClick={aoIniciar}
           aria-label="Iniciar sessão de foco"
         >
-          ▶ Iniciar Sessão de Foco
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor" style={{ marginRight: '8px' }}>
+            <polygon points="5 3 19 12 5 21 5 3" />
+          </svg>
+          Iniciar Sessão de Foco
         </button>
       )}
 
@@ -58,54 +61,72 @@ export const ControlesSessao: React.FC<ControlesSessaoProps> = ({
           {status === 'emAndamento' ? (
             <button
               type="button"
-              className="btn btn-secundario btn-acao-principal"
+              className="btn btn-secundario btn-acao-principal btn-pausar"
               onClick={aoPausar}
               aria-label="Pausar contagem"
             >
-              ⏸ Pausar
+              <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor" style={{ marginRight: '6px' }}>
+                <rect x="6" y="4" width="4" height="16" rx="1" />
+                <rect x="14" y="4" width="4" height="16" rx="1" />
+              </svg>
+              Pausar
             </button>
           ) : (
             <button
               type="button"
-              className="btn btn-primario btn-acao-principal"
+              className="btn btn-primario btn-acao-principal btn-retomar"
               onClick={aoRetomar}
               aria-label="Retomar contagem"
             >
-              ▶ Retomar
+              <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor" style={{ marginRight: '6px' }}>
+                <polygon points="5 3 19 12 5 21 5 3" />
+              </svg>
+              Retomar
             </button>
           )}
 
           {/* Botão Pular Fase (RN-03, RF-08, UC06) */}
           <button
             type="button"
-            className="btn btn-secundario"
+            className="btn btn-secundario btn-pular"
             onClick={aoPular}
             title="Avança manualmente para a próxima fase sem alterar contagem de ciclos (RN-03)"
             aria-label="Pular fase atual"
           >
-            ⏭ Pular Fase
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor" style={{ marginRight: '6px' }}>
+              <polygon points="5 4 15 12 5 20 5 4" />
+              <line x1="19" y1="5" x2="19" y2="19" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" />
+            </svg>
+            Pular Fase
           </button>
 
           {/* Botão Reiniciar Ciclos (RN-04, RN-11, RF-09, UC07) */}
           <button
             type="button"
-            className="btn btn-secundario"
+            className="btn btn-secundario btn-reiniciar"
             onClick={() => setModalReiniciarAberto(true)}
             title="Retorna ao primeiro ciclo de foco (RN-04)"
             aria-label="Reiniciar ciclos de estudo"
           >
-            🔄 Reiniciar Ciclos
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ marginRight: '6px' }}>
+              <polyline points="1 4 1 10 7 10" />
+              <path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10" />
+            </svg>
+            Reiniciar Ciclos
           </button>
 
           {/* Botão Encerrar Sessão (RN-11, RF-10, UC08) */}
           <button
             type="button"
-            className="btn btn-perigo"
+            className="btn btn-perigo btn-encerrar"
             onClick={() => setModalEncerrarAberto(true)}
             title="Finaliza e descarta a sessão ativa, liberando o temporizador (RN-01)"
             aria-label="Encerrar sessão ativa"
           >
-            ⏹ Encerrar
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor" style={{ marginRight: '6px' }}>
+              <rect x="4" y="4" width="16" height="16" rx="2" />
+            </svg>
+            Encerrar
           </button>
         </div>
       )}
@@ -136,4 +157,3 @@ export const ControlesSessao: React.FC<ControlesSessaoProps> = ({
     </div>
   );
 };
-

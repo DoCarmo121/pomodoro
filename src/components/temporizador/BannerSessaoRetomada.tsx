@@ -51,10 +51,15 @@ export const BannerSessaoRetomada: React.FC<BannerSessaoRetomadaProps> = ({
         role="region"
         aria-label="Aviso de Sessão Retomada"
       >
-        <div className="banner-retomada-icone">🔄</div>
+        <div className="banner-retomada-icone" aria-hidden="true">
+          <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <polyline points="23 4 23 10 17 10" />
+            <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10" />
+          </svg>
+        </div>
 
         <div className="banner-retomada-conteudo">
-          <h4 className="banner-retomada-titulo">Sessão Anterior Retomada Automaticamente</h4>
+          <h4 className="banner-retomada-titulo">Sessão Anterior Retomada</h4>
           <p className="banner-retomada-texto">{obterMensagemDescritiva()}</p>
         </div>
 
@@ -66,7 +71,11 @@ export const BannerSessaoRetomada: React.FC<BannerSessaoRetomadaProps> = ({
             onClick={() => setModalConfirmarDescarte(true)}
             aria-label="Descartar sessão retomada"
           >
-            🗑️ Descartar Sessão
+            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ marginRight: '5px' }}>
+              <polyline points="3 6 5 6 21 6" />
+              <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
+            </svg>
+            Descartar
           </button>
 
           {/* Botão de Prosseguir */}

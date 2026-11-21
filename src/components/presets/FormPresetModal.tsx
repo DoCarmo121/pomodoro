@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { createPortal } from 'react-dom';
 import {
   TemporizadorPersonalizado,
   DadosEntradaPreset,
@@ -29,6 +30,11 @@ export const FormPresetModal: React.FC<FormPresetModalProps> = ({
 
   const modalRef = useRef<HTMLDivElement>(null);
   const inputNomeRef = useRef<HTMLInputElement>(null);
+  const aoFecharRef = useRef(aoFechar);
+
+  useEffect(() => {
+    aoFecharRef.current = aoFechar;
+  }, [aoFechar]);
 
   // Inicializa o formulário com dados do preset em edição ou valores padrão
   useEffect(() => {
@@ -48,7 +54,7 @@ export const FormPresetModal: React.FC<FormPresetModalProps> = ({
     setErros({});
   }, [presetEmEdicao, aberto]);
 
-  // Foco inicial e controle de teclado (Escape e Tab trap - RNF-07)
+  // Foco inicial executado apenas UMA vez ao abrir o modal
   useEffect(() => {
     if (!aberto) return;
 
@@ -56,9 +62,16 @@ export const FormPresetModal: React.FC<FormPresetModalProps> = ({
       inputNomeRef.current?.focus();
     }, 50);
 
+    return () => clearTimeout(timer);
+  }, [aberto]);
+
+  // Controle de teclado (Escape e Tab trap - RNF-07)
+  useEffect(() => {
+    if (!aberto) return;
+
     const lidarComTeclas = (e: KeyboardEvent) => {
       if (e.key === 'Escape') {
-        aoFechar();
+        aoFecharRef.current();
         return;
       }
 
@@ -87,10 +100,9 @@ export const FormPresetModal: React.FC<FormPresetModalProps> = ({
 
     window.addEventListener('keydown', lidarComTeclas);
     return () => {
-      clearTimeout(timer);
       window.removeEventListener('keydown', lidarComTeclas);
     };
-  }, [aberto, aoFechar]);
+  }, [aberto]);
 
   if (!aberto) return null;
 
@@ -115,7 +127,7 @@ export const FormPresetModal: React.FC<FormPresetModalProps> = ({
     aoSalvar(dados);
   };
 
-  return (
+  const modalJSX = (
     <div
       className="modal-overlay"
       role="dialog"
@@ -128,15 +140,33 @@ export const FormPresetModal: React.FC<FormPresetModalProps> = ({
       }}
     >
       <div className="modal-conteudo" ref={modalRef}>
-        <h3 id="modal-preset-titulo" className="modal-titulo">
-          {presetEmEdicao ? 'Editar Temporizador' : 'Novo Temporizador'}
-        </h3>
+        <div className="modal-cabecalho">
+          <div className="modal-titulo-grupo">
+            <div className="modal-icone-wrapper" aria-hidden="true">
+              <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <circle cx="12" cy="12" r="10" />
+                <polyline points="12 6 12 12 16 14" />
+              </svg>
+            </div>
+            <h3 id="modal-preset-titulo" className="modal-titulo">
+              {presetEmEdicao ? 'Editar Temporizador' : 'Novo Temporizador'}
+            </h3>
+          </div>
+          <button
+            type="button"
+            className="modal-btn-fechar"
+            onClick={aoFechar}
+            aria-label="Fechar janela modal"
+          >
+            ✕
+          </button>
+        </div>
 
         <form onSubmit={handleSubmit} noValidate>
           {/* Nome do Preset (VR-01) */}
           <div className="form-grupo">
             <label htmlFor="preset-nome" className="form-label">
-              Nome do Temporizador *
+              Nome do Temporizador <span className="campo-obrigatorio">*</span>
             </label>
             <input
               ref={inputNomeRef}
@@ -156,15 +186,17 @@ export const FormPresetModal: React.FC<FormPresetModalProps> = ({
                 }
               }}
             />
-            <MensagemErro id="erro-preset-nome" mensagem={erros.nome} />
-            <small className="form-ajuda">{nome.length}/40 caracteres</small>
+            <div className="form-grupo-rodape">
+              <MensagemErro id="erro-preset-nome" mensagem={erros.nome} />
+              <small className="form-ajuda">{nome.length}/40 caracteres</small>
+            </div>
           </div>
 
           <div className="form-linha">
             {/* Tempo de Foco (VR-02) */}
             <div className="form-grupo form-metade">
               <label htmlFor="preset-foco" className="form-label">
-                Foco (minutos) *
+                Foco (minutos) <span className="campo-obrigatorio">*</span>
               </label>
               <input
                 id="preset-foco"
@@ -183,14 +215,16 @@ export const FormPresetModal: React.FC<FormPresetModalProps> = ({
                   }
                 }}
               />
-              <MensagemErro id="erro-preset-foco" mensagem={erros.tempoFocoMin} />
-              <small className="form-ajuda">1 a 120 min</small>
+              <div className="form-grupo-rodape">
+                <MensagemErro id="erro-preset-foco" mensagem={erros.tempoFocoMin} />
+                <small className="form-ajuda">1 a 120 min</small>
+              </div>
             </div>
 
             {/* Tempo de Pausa Curta (VR-03) */}
             <div className="form-grupo form-metade">
               <label htmlFor="preset-pausa-curta" className="form-label">
-                Pausa Curta (min) *
+                Pausa Curta (min) <span className="campo-obrigatorio">*</span>
               </label>
               <input
                 id="preset-pausa-curta"
@@ -209,8 +243,10 @@ export const FormPresetModal: React.FC<FormPresetModalProps> = ({
                   }
                 }}
               />
-              <MensagemErro id="erro-preset-pausa-curta" mensagem={erros.tempoPausaCurtaMin} />
-              <small className="form-ajuda">1 a 60 min</small>
+              <div className="form-grupo-rodape">
+                <MensagemErro id="erro-preset-pausa-curta" mensagem={erros.tempoPausaCurtaMin} />
+                <small className="form-ajuda">1 a 60 min</small>
+              </div>
             </div>
           </div>
 
@@ -218,7 +254,7 @@ export const FormPresetModal: React.FC<FormPresetModalProps> = ({
             {/* Ciclos antes da Pausa Longa (VR-04) */}
             <div className="form-grupo form-metade">
               <label htmlFor="preset-ciclos" className="form-label">
-                Ciclos até Pausa Longa *
+                Ciclos até Pausa Longa <span className="campo-obrigatorio">*</span>
               </label>
               <input
                 id="preset-ciclos"
@@ -237,14 +273,16 @@ export const FormPresetModal: React.FC<FormPresetModalProps> = ({
                   }
                 }}
               />
-              <MensagemErro id="erro-preset-ciclos" mensagem={erros.ciclosAntesPausaLonga} />
-              <small className="form-ajuda">1 a 12 ciclos</small>
+              <div className="form-grupo-rodape">
+                <MensagemErro id="erro-preset-ciclos" mensagem={erros.ciclosAntesPausaLonga} />
+                <small className="form-ajuda">1 a 12 ciclos</small>
+              </div>
             </div>
 
             {/* Tempo de Pausa Longa (VR-05) */}
             <div className="form-grupo form-metade">
               <label htmlFor="preset-pausa-longa" className="form-label">
-                Pausa Longa (min) *
+                Pausa Longa (min) <span className="campo-obrigatorio">*</span>
               </label>
               <input
                 id="preset-pausa-longa"
@@ -263,8 +301,10 @@ export const FormPresetModal: React.FC<FormPresetModalProps> = ({
                   }
                 }}
               />
-              <MensagemErro id="erro-preset-pausa-longa" mensagem={erros.tempoPausaLongaMin} />
-              <small className="form-ajuda">1 a 60 min</small>
+              <div className="form-grupo-rodape">
+                <MensagemErro id="erro-preset-pausa-longa" mensagem={erros.tempoPausaLongaMin} />
+                <small className="form-ajuda">1 a 60 min</small>
+              </div>
             </div>
           </div>
 
@@ -284,4 +324,8 @@ export const FormPresetModal: React.FC<FormPresetModalProps> = ({
       </div>
     </div>
   );
+
+  return typeof document !== 'undefined'
+    ? createPortal(modalJSX, document.body)
+    : modalJSX;
 };

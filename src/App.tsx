@@ -338,13 +338,46 @@ export const App: React.FC = () => {
     sessaoAtiva !== null &&
     (sessaoAtiva.status === 'emAndamento' || sessaoAtiva.status === 'pausada');
 
+  const faseAtual = sessaoAtiva ? sessaoAtiva.faseAtual : 'foco';
+
   return (
-    <div className="app-container">
+    <div className={`app-container fase-atual-${faseAtual}`}>
       <header className="app-header">
-        <h1>Gestão de Foco (Pomodoro)</h1>
-        <p className="app-subtitulo">
-          Ciclos de estudo personalizados e gerenciamento de tarefas
-        </p>
+        <div className="app-header-brand">
+          <div className="brand-icone-wrapper" aria-hidden="true">
+            <svg viewBox="0 0 24 24" width="32" height="32" fill="none">
+              <path
+                d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2z"
+                fill="url(#brand-grad)"
+              />
+              <path
+                d="M12 6v6l4 2"
+                stroke="#ffffff"
+                strokeWidth="2.2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+              <path
+                d="M12 2c0-1 1-2 2-2"
+                stroke="#10b981"
+                strokeWidth="2"
+                strokeLinecap="round"
+              />
+              <defs>
+                <linearGradient id="brand-grad" x1="2" y1="2" x2="22" y2="22" gradientUnits="userSpaceOnUse">
+                  <stop stopColor="#f43f5e" />
+                  <stop offset="1" stopColor="#e11d48" />
+                </linearGradient>
+              </defs>
+            </svg>
+          </div>
+          <div className="brand-textos">
+            <h1>Gestão de Foco <span className="brand-destaque">(Pomodoro)</span></h1>
+            <p className="app-subtitulo">
+              Ciclos de estudo personalizados e gerenciamento de tarefas
+            </p>
+          </div>
+        </div>
       </header>
 
       <main className="app-main-layout">
