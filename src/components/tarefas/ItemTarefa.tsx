@@ -35,13 +35,11 @@ export const ItemTarefa: React.FC<ItemTarefaProps> = ({
         <h4 className="item-tarefa-titulo">{tarefa.titulo}</h4>
 
         <div className="item-tarefa-badges">
-          {/* Badge de Prioridade com indicador luminoso */}
           <span className={`badge-prioridade prioridade-${tarefa.prioridade}`}>
             <span className="ponto-prioridade" aria-hidden="true" />
             Prioridade: {obterNomePrioridadeTarefa(tarefa.prioridade)}
           </span>
 
-          {/* Badge / Seletor de Estado Rápido */}
           <div className="item-tarefa-estado-seletor">
             <label htmlFor={`estado-select-${tarefa.id}`} className="sr-only">
               Alterar estado da tarefa {tarefa.titulo}

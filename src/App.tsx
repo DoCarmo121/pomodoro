@@ -39,7 +39,6 @@ import {
 import './App.css';
 
 export const App: React.FC = () => {
-  // ===== Estado dos Presets (Fase 6) =====
   const [presets, setPresets] = useState<TemporizadorPersonalizado[]>(() =>
     obterPresets()
   );
@@ -48,8 +47,6 @@ export const App: React.FC = () => {
     return salvos[0]?.id ?? '';
   });
 
-  // ===== Estado da Sessão Ativa (Fase 7 e Fase 8) =====
-  // RF-12, UC10: Ao carregar a aplicação, restaura a sessão e recalcula por timestamps (RN-06, RN-07, RN-08)
   const [sessaoAtiva, setSessaoAtiva] = useState<SessaoAtiva | null>(() => {
     const salva = obterSessaoAtiva();
     if (!salva) return null;
@@ -58,12 +55,10 @@ export const App: React.FC = () => {
     return recalculo;
   });
 
-  // Flag para exibição do Banner de Sessão Retomada (RF-13, UC11)
   const [sessaoRetomada, setSessaoRetomada] = useState<boolean>(() => {
     return obterSessaoAtiva() !== null;
   });
 
-  // Preset selecionado atualmente
   const presetSelecionado = useMemo(() => {
     return (
       presets.find((p) => p.id === presetSelecionadoId) ??
@@ -80,10 +75,8 @@ export const App: React.FC = () => {
     );
   }, [presets, presetSelecionadoId]);
 
-  // Snapshot ou parâmetros do temporizador em exibição
   const presetEmExibicao = sessaoAtiva ? sessaoAtiva.snapshotPreset : presetSelecionado;
 
-  // Tempo restante em milissegundos para a interface
   const [tempoRestanteMs, setTempoRestanteMs] = useState<number>(() => {
     if (sessaoAtiva) {
       return calcularTempoRestanteMs(sessaoAtiva, Date.now());
@@ -91,10 +84,8 @@ export const App: React.FC = () => {
     return presetSelecionado.tempoFocoMin * 60 * 1000;
   });
 
-  // ===== Estado das Tarefas (Fase 5) =====
   const [tarefas, setTarefas] = useState<Tarefa[]>(() => obterTarefas());
 
-  // ===== Loop de Atualização do Temporizador (RNF-03, RN-13, RF-14) =====
   useEffect(() => {
     if (!sessaoAtiva) {
       setTempoRestanteMs(presetSelecionado.tempoFocoMin * 60 * 1000);
@@ -111,16 +102,13 @@ export const App: React.FC = () => {
       return;
     }
 
-    // Intervalo de verificação a cada 200ms para manter alta precisão temporal (RNF-03)
     const interval = setInterval(() => {
       const agora = Date.now();
       const restante = calcularTempoRestanteMs(sessaoAtiva, agora);
 
       if (restante <= 0) {
-        // Alerta sonoro ao fim de cada fase (RN-13, RF-14)
         tocarAlertaSonoro();
 
-        // Transição natural para a próxima fase
         const novaSessao = avancarFaseConcluida(sessaoAtiva, agora);
         setSessaoAtiva(novaSessao);
         salvarSessaoAtiva(novaSessao);
@@ -133,11 +121,8 @@ export const App: React.FC = () => {
     return () => clearInterval(interval);
   }, [sessaoAtiva, presetSelecionado]);
 
-  // ===== Controles da Sessão de Foco =====
-
-  // RF-05, UC04: Iniciar Sessão com snapshot imutável (RN-05)
   const handleIniciarSessao = useCallback(() => {
-    inicializarAudio(); // Destrava o áudio no clique do usuário (R-01)
+    inicializarAudio();
     setSessaoRetomada(false);
     const agora = Date.now();
     const nova = iniciarNovaSessao(presetSelecionado, agora);
@@ -146,7 +131,6 @@ export const App: React.FC = () => {
     setTempoRestanteMs(obterDuracaoFaseMs(nova.snapshotPreset, 'foco'));
   }, [presetSelecionado]);
 
-  // RF-06, UC05: Pausar Sessão
   const handlePausarSessao = useCallback(() => {
     if (!sessaoAtiva) return;
     const pausada = pausarSessao(sessaoAtiva, Date.now());
@@ -154,7 +138,6 @@ export const App: React.FC = () => {
     salvarSessaoAtiva(pausada);
   }, [sessaoAtiva]);
 
-  // RF-07, UC05: Retomar Sessão
   const handleRetomarSessao = useCallback(() => {
     if (!sessaoAtiva) return;
     inicializarAudio();
@@ -163,7 +146,6 @@ export const App: React.FC = () => {
     salvarSessaoAtiva(retomada);
   }, [sessaoAtiva]);
 
-  // RF-08, UC06: Pular Fase sem incrementar ciclos (RN-03)
   const handlePularFase = useCallback(() => {
     if (!sessaoAtiva) return;
     const pulada = pularFase(sessaoAtiva, Date.now());
@@ -172,7 +154,6 @@ export const App: React.FC = () => {
     setTempoRestanteMs(calcularTempoRestanteMs(pulada, Date.now()));
   }, [sessaoAtiva]);
 
-  // RF-09, UC07: Reiniciar Ciclos (RN-04)
   const handleReiniciarCiclos = useCallback(() => {
     if (!sessaoAtiva) return;
     const reiniciada = reiniciarCiclos(sessaoAtiva, Date.now());
@@ -181,7 +162,6 @@ export const App: React.FC = () => {
     setTempoRestanteMs(obterDuracaoFaseMs(reiniciada.snapshotPreset, 'foco'));
   }, [sessaoAtiva]);
 
-  // RF-10, UC08: Encerrar Sessão (libera o preset para edição/exclusão por RN-01)
   const handleEncerrarSessao = useCallback(() => {
     limparSessaoAtiva();
     setSessaoAtiva(null);
@@ -189,7 +169,6 @@ export const App: React.FC = () => {
     setTempoRestanteMs(presetSelecionado.tempoFocoMin * 60 * 1000);
   }, [presetSelecionado]);
 
-  // RF-13, UC11: Descartar sessão retomada sem contabilizar progresso (libera preset para edição/exclusão)
   const handleDescartarSessaoRetomada = useCallback(() => {
     limparSessaoAtiva();
     setSessaoAtiva(null);
@@ -197,13 +176,11 @@ export const App: React.FC = () => {
     setTempoRestanteMs(presetSelecionado.tempoFocoMin * 60 * 1000);
   }, [presetSelecionado]);
 
-  // RF-11, UC09: Trocar Preset com Encerramento Automático (RN-02)
   const handleTrocarPreset = useCallback(
     (novoPreset: TemporizadorPersonalizado) => {
       setPresetSelecionadoId(novoPreset.id);
       setSessaoRetomada(false);
 
-      // RN-02: Se houver sessão ativa em andamento ou pausada, encerra automaticamente e inicia nova sessão
       if (sessaoAtiva && sessaoAtiva.status !== 'concluida') {
         inicializarAudio();
         const agora = Date.now();
@@ -218,7 +195,6 @@ export const App: React.FC = () => {
     [sessaoAtiva]
   );
 
-  // ===== Handlers de Presets (Fase 6) =====
   const persistirPresets = (novosPresets: TemporizadorPersonalizado[]) => {
     setPresets(novosPresets);
     salvarPresets(novosPresets);
@@ -243,7 +219,6 @@ export const App: React.FC = () => {
   };
 
   const handleEditarPreset = (id: string, dados: DadosEntradaPreset) => {
-    // RN-01: Preset em uso pela sessão ativa não pode ser editado
     if (sessaoAtiva && id === sessaoAtiva.presetId) return;
 
     const atualizados = presets.map((p) =>
@@ -263,7 +238,6 @@ export const App: React.FC = () => {
   };
 
   const handleExcluirPreset = (id: string) => {
-    // RN-01: Preset em uso pela sessão ativa não pode ser excluído
     if (sessaoAtiva && id === sessaoAtiva.presetId) return;
     if (presets.length <= 1) return;
 
@@ -275,7 +249,6 @@ export const App: React.FC = () => {
     }
   };
 
-  // ===== Handlers de Tarefas (Fase 5) =====
   const persistirTarefas = (novasTarefas: Tarefa[]) => {
     setTarefas(novasTarefas);
     salvarTarefas(novasTarefas);
@@ -329,7 +302,6 @@ export const App: React.FC = () => {
     persistirTarefas(atualizadas);
   };
 
-  // Duração total da fase atual em milissegundos (para a barra de progresso)
   const duracaoTotalFaseMs = sessaoAtiva
     ? obterDuracaoFaseMs(sessaoAtiva.snapshotPreset, sessaoAtiva.faseAtual)
     : presetSelecionado.tempoFocoMin * 60 * 1000;
@@ -381,9 +353,7 @@ export const App: React.FC = () => {
       </header>
 
       <main className="app-main-layout">
-        {/* Seção Principal: Temporizador, Controles e Presets */}
         <section className="temporizador-secao" aria-label="Temporizador de Foco">
-          {/* Banner de Sessão Retomada Automaticamente (RF-12, RF-13, UC10, UC11) */}
           {sessaoAtiva && (
             <BannerSessaoRetomada
               aberto={sessaoRetomada}
@@ -396,7 +366,6 @@ export const App: React.FC = () => {
             />
           )}
 
-          {/* Seletor Rápido de Presets (RF-11, UC09, RN-02) */}
           <SeletorPresets
             presets={presets}
             presetSelecionadoId={presetSelecionado.id}
@@ -404,7 +373,6 @@ export const App: React.FC = () => {
             aoTrocarPreset={handleTrocarPreset}
           />
 
-          {/* Display Digital do Temporizador (RF-05, CP 7.1) */}
           <DisplayTemporizador
             tempoRestanteMs={tempoRestanteMs}
             faseAtual={sessaoAtiva ? sessaoAtiva.faseAtual : 'foco'}
@@ -415,7 +383,6 @@ export const App: React.FC = () => {
             duracaoTotalFaseMs={duracaoTotalFaseMs}
           />
 
-          {/* Controles da Sessão de Foco (RF-05 a RF-10, CP 7.2) */}
           <ControlesSessao
             status={sessaoAtiva ? sessaoAtiva.status : 'inativo'}
             aoIniciar={handleIniciarSessao}
@@ -426,7 +393,6 @@ export const App: React.FC = () => {
             aoEncerrarSessao={handleEncerrarSessao}
           />
 
-          {/* Listagem e Gestão Completa de Presets (RF-01 a RF-04, RN-01) */}
           <ListaPresets
             presets={presets}
             presetSelecionadoId={presetSelecionado.id}
@@ -438,7 +404,6 @@ export const App: React.FC = () => {
           />
         </section>
 
-        {/* Seção Lateral Direita: Tarefas de Estudo (RF-18, UC15, RN-10) */}
         <aside className="tarefas-secao" aria-label="Painel de Tarefas">
           <PainelTarefas
             tarefas={tarefas}

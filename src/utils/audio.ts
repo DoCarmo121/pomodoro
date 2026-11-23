@@ -1,14 +1,5 @@
-/**
- * Módulo de Alerta Sonoro utilizando Web Audio API nativa.
- * Atende ao RF-14, RN-13, RNF-10 e resolve o risco R-01 (política de autoplay).
- */
-
 let audioContextInstance: AudioContext | null = null;
 
-/**
- * Obtém ou cria a instância única do AudioContext.
- * Retorna null se executado fora do navegador (ex: testes em Node.js).
- */
 function obterAudioContext(): AudioContext | null {
   if (typeof window === 'undefined') {
     return null;
@@ -27,10 +18,6 @@ function obterAudioContext(): AudioContext | null {
   return audioContextInstance;
 }
 
-/**
- * Inicializa ou destrava o AudioContext após uma interação do usuário (ex: clique no botão Iniciar).
- * Essencial para contornar a restrição de autoplay dos navegadores (R-01).
- */
 export async function inicializarAudio(): Promise<void> {
   const ctx = obterAudioContext();
   if (!ctx) return;
@@ -44,21 +31,14 @@ export async function inicializarAudio(): Promise<void> {
   }
 }
 
-/**
- * Emite o alerta sonoro audível ao final de uma fase (RN-13, RF-14).
- * Utiliza osciladores senoidais sintetizados nativamente com decaimento suave,
- * evitando arquivos de áudio externos que poderiam falhar ao carregar.
- */
 export async function tocarAlertaSonoro(): Promise<void> {
   const ctx = obterAudioContext();
   if (!ctx) return;
 
-  // Garante que o contexto não está suspenso
   if (ctx.state === 'suspended') {
     try {
       await ctx.resume();
     } catch {
-      // Se o navegador bloquear, não interrompe o fluxo da aplicação
       return;
     }
   }
@@ -66,7 +46,6 @@ export async function tocarAlertaSonoro(): Promise<void> {
   try {
     const agora = ctx.currentTime;
 
-    // Tom 1: Nota Lá (440 Hz)
     const osc1 = ctx.createOscillator();
     const gain1 = ctx.createGain();
     osc1.type = 'sine';
@@ -79,7 +58,6 @@ export async function tocarAlertaSonoro(): Promise<void> {
     osc1.start(agora);
     osc1.stop(agora + 0.35);
 
-    // Tom 2: Nota Mi (659.25 Hz) um pouco depois, gerando um efeito de sino agradável
     const osc2 = ctx.createOscillator();
     const gain2 = ctx.createGain();
     osc2.type = 'sine';
@@ -95,4 +73,3 @@ export async function tocarAlertaSonoro(): Promise<void> {
     console.error('Falha ao emitir alerta sonoro da Web Audio API:', erro);
   }
 }
-

@@ -1,12 +1,6 @@
 import { TemporizadorPersonalizado } from '../types';
 import { CHAVE_STORAGE_PRESETS } from './chaves';
 
-/**
- * Preset padrão inicial disponibilizado ao usuário quando o sistema
- * é executado pela primeira vez ou quando não há presets salvos.
- * Segue o modelo tradicional de Pomodoro: 25 min foco, 5 min pausa curta,
- * 4 ciclos antes da pausa longa de 15 min.
- */
 export const PRESET_PADRAO: TemporizadorPersonalizado = {
   id: 'preset-classico-padrao',
   nome: 'Pomodoro Clássico',
@@ -18,9 +12,6 @@ export const PRESET_PADRAO: TemporizadorPersonalizado = {
   atualizadoEm: 1700000000000,
 };
 
-/**
- * Validação básica da estrutura de um preset recuperado do storage
- */
 function ehEstruturaPresetValida(obj: unknown): obj is TemporizadorPersonalizado {
   if (typeof obj !== 'object' || obj === null) return false;
   const p = obj as Record<string, unknown>;
@@ -36,11 +27,6 @@ function ehEstruturaPresetValida(obj: unknown): obj is TemporizadorPersonalizado
   );
 }
 
-/**
- * Recupera todos os presets armazenados no localStorage.
- * Se nenhum preset existir ou se os dados estiverem corrompidos,
- * inicializa a persistência com o preset padrão e o retorna.
- */
 export function obterPresets(): TemporizadorPersonalizado[] {
   try {
     const raw = localStorage.getItem(CHAVE_STORAGE_PRESETS);
@@ -69,10 +55,6 @@ export function obterPresets(): TemporizadorPersonalizado[] {
   }
 }
 
-/**
- * Persiste a lista completa de presets no localStorage.
- * Trata exceções de cota cheia do navegador (RNF-06, R-04).
- */
 export function salvarPresets(presets: TemporizadorPersonalizado[]): void {
   try {
     localStorage.setItem(CHAVE_STORAGE_PRESETS, JSON.stringify(presets));
@@ -81,4 +63,3 @@ export function salvarPresets(presets: TemporizadorPersonalizado[]): void {
     throw new Error('Não foi possível salvar os temporizadores. Verifique o espaço de armazenamento local.');
   }
 }
-

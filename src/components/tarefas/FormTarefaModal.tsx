@@ -27,7 +27,6 @@ export const FormTarefaModal: React.FC<FormTarefaModalProps> = ({
   aoSalvar,
   aoFechar,
 }) => {
-  // RN-12: Toda tarefa criada assume estado 'backlog' e prioridade 'media' como valores padrão
   const [titulo, setTitulo] = useState('');
   const [estado, setEstado] = useState<EstadoTarefa>('backlog');
   const [prioridade, setPrioridade] = useState<PrioridadeTarefa>('media');
@@ -41,14 +40,12 @@ export const FormTarefaModal: React.FC<FormTarefaModalProps> = ({
     aoFecharRef.current = aoFechar;
   }, [aoFechar]);
 
-  // Atualiza os campos ao abrir o modal para criação ou edição
   useEffect(() => {
     if (tarefaEmEdicao) {
       setTitulo(tarefaEmEdicao.titulo);
       setEstado(tarefaEmEdicao.estado);
       setPrioridade(tarefaEmEdicao.prioridade);
     } else {
-      // Valores padrão conforme RN-12
       setTitulo('');
       setEstado('backlog');
       setPrioridade('media');
@@ -56,7 +53,6 @@ export const FormTarefaModal: React.FC<FormTarefaModalProps> = ({
     setErros({});
   }, [tarefaEmEdicao, aberto]);
 
-  // Foco inicial executado apenas UMA vez ao abrir o modal
   useEffect(() => {
     if (!aberto) return;
 
@@ -67,7 +63,6 @@ export const FormTarefaModal: React.FC<FormTarefaModalProps> = ({
     return () => clearTimeout(timer);
   }, [aberto]);
 
-  // Controle de teclado (Escape e Tab trap - RNF-07)
   useEffect(() => {
     if (!aberto) return;
 

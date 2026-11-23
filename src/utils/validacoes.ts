@@ -7,9 +7,6 @@ import type {
   PrioridadeTarefa,
 } from '../types';
 
-/**
- * Utilitário para verificar se um valor é um número inteiro válido
- */
 function ehInteiroValido(valor: unknown): boolean {
   if (typeof valor === 'number') {
     return Number.isInteger(valor);
@@ -25,10 +22,6 @@ function ehInteiroValido(valor: unknown): boolean {
   return false;
 }
 
-/**
- * VR-01: Validação do nome do preset
- * Obrigatório, entre 1 e 40 caracteres.
- */
 export function validarNomePreset(nome: string): string | null {
   const nomeLimpo = nome.trim();
   if (nomeLimpo.length === 0) {
@@ -40,10 +33,6 @@ export function validarNomePreset(nome: string): string | null {
   return null;
 }
 
-/**
- * VR-02: Validação do tempo de foco
- * Inteiro entre 1 e 120 minutos.
- */
 export function validarTempoFoco(tempo: unknown): string | null {
   if (!ehInteiroValido(tempo)) {
     return 'O tempo de foco deve ser um número inteiro entre 1 e 120 minutos.';
@@ -55,10 +44,6 @@ export function validarTempoFoco(tempo: unknown): string | null {
   return null;
 }
 
-/**
- * VR-03: Validação do tempo de pausa curta
- * Inteiro entre 1 e 60 minutos.
- */
 export function validarTempoPausaCurta(tempo: unknown): string | null {
   if (!ehInteiroValido(tempo)) {
     return 'O tempo de pausa curta deve ser um número inteiro entre 1 e 60 minutos.';
@@ -70,10 +55,6 @@ export function validarTempoPausaCurta(tempo: unknown): string | null {
   return null;
 }
 
-/**
- * VR-04: Validação da quantidade de ciclos antes da pausa longa
- * Inteiro entre 1 e 12.
- */
 export function validarCiclosAntesPausaLonga(ciclos: unknown): string | null {
   if (!ehInteiroValido(ciclos)) {
     return 'A quantidade de ciclos antes da pausa longa deve ser um número inteiro entre 1 e 12.';
@@ -85,10 +66,6 @@ export function validarCiclosAntesPausaLonga(ciclos: unknown): string | null {
   return null;
 }
 
-/**
- * VR-05: Validação do tempo de pausa longa
- * Inteiro entre 1 e 60 minutos.
- */
 export function validarTempoPausaLonga(tempo: unknown): string | null {
   if (!ehInteiroValido(tempo)) {
     return 'O tempo de pausa longa deve ser um número inteiro entre 1 e 60 minutos.';
@@ -100,9 +77,6 @@ export function validarTempoPausaLonga(tempo: unknown): string | null {
   return null;
 }
 
-/**
- * Validação completa do formulário de preset (VR-01 a VR-05)
- */
 export function validarFormularioPreset(dados: DadosEntradaPreset): {
   valido: boolean;
   erros: ErrosFormularioPreset;
@@ -130,10 +104,6 @@ export function validarFormularioPreset(dados: DadosEntradaPreset): {
   };
 }
 
-/**
- * VR-06: Validação do título da tarefa
- * Obrigatório, entre 1 e 100 caracteres.
- */
 export function validarTituloTarefa(titulo: string): string | null {
   const tituloLimpo = titulo.trim();
   if (tituloLimpo.length === 0) {
@@ -153,10 +123,6 @@ const ESTADOS_VALIDOS: EstadoTarefa[] = [
   'cancelada',
 ];
 
-/**
- * VR-07: Validação do estado da tarefa
- * Um entre backlog, aFazer, emExecucao, concluida e cancelada.
- */
 export function validarEstadoTarefa(estado: unknown): string | null {
   if (typeof estado !== 'string' || !ESTADOS_VALIDOS.includes(estado as EstadoTarefa)) {
     return 'Estado inválido. Escolha entre: Backlog, A fazer, Em execução, Concluída ou Cancelada.';
@@ -166,10 +132,6 @@ export function validarEstadoTarefa(estado: unknown): string | null {
 
 const PRIORIDADES_VALIDAS: PrioridadeTarefa[] = ['baixa', 'media', 'alta'];
 
-/**
- * VR-08: Validação da prioridade da tarefa
- * Uma entre baixa, média e alta.
- */
 export function validarPrioridadeTarefa(prioridade: unknown): string | null {
   if (
     typeof prioridade !== 'string' ||
@@ -180,9 +142,6 @@ export function validarPrioridadeTarefa(prioridade: unknown): string | null {
   return null;
 }
 
-/**
- * Validação completa do formulário de tarefa (VR-06 a VR-08)
- */
 export function validarFormularioTarefa(dados: DadosEntradaTarefa): {
   valido: boolean;
   erros: ErrosFormularioTarefa;

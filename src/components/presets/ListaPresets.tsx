@@ -6,7 +6,7 @@ import { ModalConfirmacao } from '../comum/ModalConfirmacao';
 export interface ListaPresetsProps {
   presets: TemporizadorPersonalizado[];
   presetSelecionadoId: string;
-  presetAtivoId?: string | null; // ID do preset que está em execução na sessão ativa (RN-01)
+  presetAtivoId?: string | null;
   aoSelecionarPreset: (preset: TemporizadorPersonalizado) => void;
   aoCriarPreset: (dados: DadosEntradaPreset) => void;
   aoEditarPreset: (id: string, dados: DadosEntradaPreset) => void;
@@ -25,7 +25,6 @@ export const ListaPresets: React.FC<ListaPresetsProps> = ({
   const [modalFormAberto, setModalFormAberto] = useState(false);
   const [presetEmEdicao, setPresetEmEdicao] = useState<TemporizadorPersonalizado | null>(null);
 
-  // Estado para exclusão com confirmação obrigatória (RN-11, RF-03, UC03)
   const [presetParaExcluir, setPresetParaExcluir] = useState<TemporizadorPersonalizado | null>(null);
   const [mensagemBloqueio, setMensagemBloqueio] = useState<string | null>(null);
 
@@ -35,7 +34,6 @@ export const ListaPresets: React.FC<ListaPresetsProps> = ({
   };
 
   const abrirModalEditar = (preset: TemporizadorPersonalizado) => {
-    // RN-01: Um preset em uso por sessão ativa não pode ser editado
     if (preset.id === presetAtivoId) {
       setMensagemBloqueio(
         `O temporizador "${preset.nome}" está em uso pela sessão ativa e não pode ser editado no momento (RN-01).`
@@ -47,7 +45,6 @@ export const ListaPresets: React.FC<ListaPresetsProps> = ({
   };
 
   const solicitarExclusao = (preset: TemporizadorPersonalizado) => {
-    // RN-01: Um preset em uso por sessão ativa não pode ser excluído
     if (preset.id === presetAtivoId) {
       setMensagemBloqueio(
         `O temporizador "${preset.nome}" está em uso pela sessão ativa e não pode ser excluído no momento (RN-01).`
@@ -55,7 +52,6 @@ export const ListaPresets: React.FC<ListaPresetsProps> = ({
       return;
     }
 
-    // Não permite excluir se for o único preset (UC04 pré-requisito: existir ao menos um preset)
     if (presets.length <= 1) {
       setMensagemBloqueio('Você deve manter ao menos um temporizador cadastrado no sistema.');
       return;
@@ -114,7 +110,6 @@ export const ListaPresets: React.FC<ListaPresetsProps> = ({
         </button>
       </header>
 
-      {/* Aviso de bloqueio RN-01 quando aplicável */}
       {mensagemBloqueio && (
         <div className="alerta-bloqueio" role="alert">
           <div className="alerta-bloqueio-texto">
@@ -136,7 +131,6 @@ export const ListaPresets: React.FC<ListaPresetsProps> = ({
         </div>
       )}
 
-      {/* Grade de Presets (RF-04) */}
       <div className="grid-presets">
         {presets.map((preset) => {
           const ehAtivoNaSessao = preset.id === presetAtivoId;
@@ -269,7 +263,6 @@ export const ListaPresets: React.FC<ListaPresetsProps> = ({
         })}
       </div>
 
-      {/* Modal de Criação / Edição de Preset (RF-01, RF-02, UC01, UC02) */}
       <FormPresetModal
         aberto={modalFormAberto}
         presetEmEdicao={presetEmEdicao}
@@ -277,7 +270,6 @@ export const ListaPresets: React.FC<ListaPresetsProps> = ({
         aoFechar={fecharModalForm}
       />
 
-      {/* Modal de Confirmação Obrigatória para Exclusão (RN-11, RF-03, RF-20, UC03) */}
       <ModalConfirmacao
         aberto={presetParaExcluir !== null}
         titulo="Excluir Temporizador"

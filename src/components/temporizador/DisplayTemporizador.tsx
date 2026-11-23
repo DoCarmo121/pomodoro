@@ -21,7 +21,6 @@ export const DisplayTemporizador: React.FC<DisplayTemporizadorProps> = ({
   nomePreset,
   duracaoTotalFaseMs,
 }) => {
-  // Cálculo de porcentagem de progresso da fase atual
   const tempoDecorridoMs = Math.max(0, duracaoTotalFaseMs - tempoRestanteMs);
   const porcentagemProgresso =
     duracaoTotalFaseMs > 0
@@ -30,12 +29,10 @@ export const DisplayTemporizador: React.FC<DisplayTemporizadorProps> = ({
 
   const nomeFaseLegivel = obterNomeFase(faseAtual);
 
-  // Parâmetros do anel circular SVG
   const raio = 108;
-  const circunferencia = 2 * Math.PI * raio; // ~678.58
+  const circunferencia = 2 * Math.PI * raio;
   const offsetCirculo = circunferencia - (porcentagemProgresso / 100) * circunferencia;
 
-  // Ícone representativo da fase atual
   const renderIconeFase = () => {
     switch (faseAtual) {
       case 'foco':
@@ -64,7 +61,6 @@ export const DisplayTemporizador: React.FC<DisplayTemporizadorProps> = ({
       className={`display-temporizador fase-${faseAtual} status-${status}`}
       aria-live="polite"
     >
-      {/* Informações de cabeçalho do temporizador */}
       <div className="display-info-cabecalho">
         <span className={`badge-fase badge-fase-${faseAtual}`}>
           {renderIconeFase()}
@@ -79,7 +75,6 @@ export const DisplayTemporizador: React.FC<DisplayTemporizadorProps> = ({
         </span>
       </div>
 
-      {/* Anel Circular com Display Digital Central */}
       <div className="display-anel-wrapper">
         <svg className="display-anel-svg" viewBox="0 0 240 240" aria-hidden="true">
           <defs>
@@ -101,7 +96,6 @@ export const DisplayTemporizador: React.FC<DisplayTemporizadorProps> = ({
             </filter>
           </defs>
 
-          {/* Círculo de fundo da trilha */}
           <circle
             className="anel-trilha-fundo"
             cx="120"
@@ -111,7 +105,6 @@ export const DisplayTemporizador: React.FC<DisplayTemporizadorProps> = ({
             strokeWidth="10"
           />
 
-          {/* Círculo do progresso animado */}
           <circle
             className={`anel-trilha-progresso progresso-${faseAtual}`}
             cx="120"
@@ -126,9 +119,7 @@ export const DisplayTemporizador: React.FC<DisplayTemporizadorProps> = ({
           />
         </svg>
 
-        {/* Conteúdo central do anel */}
         <div className="display-anel-conteudo">
-          {/* Relógio digital principal no formato MM:SS */}
           <div
             className="display-relogio"
             aria-label={`Tempo restante: ${formatarTempo(tempoRestanteMs)}`}
@@ -155,7 +146,6 @@ export const DisplayTemporizador: React.FC<DisplayTemporizadorProps> = ({
         </div>
       </div>
 
-      {/* Indicador visual de progresso dos ciclos (pontos luminosos) */}
       <div className="display-ciclos-visual" title={`Ciclo ${cicloAtual} de ${totalCiclos}`}>
         {Array.from({ length: totalCiclos }).map((_, index) => {
           const numCiclo = index + 1;
@@ -171,7 +161,6 @@ export const DisplayTemporizador: React.FC<DisplayTemporizadorProps> = ({
         })}
       </div>
 
-      {/* Barra de progresso visual complementar */}
       <div
         className="display-barra-container"
         role="progressbar"
@@ -186,7 +175,6 @@ export const DisplayTemporizador: React.FC<DisplayTemporizadorProps> = ({
         />
       </div>
 
-      {/* Rodapé do display com ciclo e status */}
       <div className="display-info-rodape">
         <span className="display-ciclos">
           <strong>Ciclo {cicloAtual}</strong> de {totalCiclos}

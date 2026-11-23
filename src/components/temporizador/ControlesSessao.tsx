@@ -21,7 +21,6 @@ export const ControlesSessao: React.FC<ControlesSessaoProps> = ({
   aoReiniciarCiclos,
   aoEncerrarSessao,
 }) => {
-  // Controle de modais de confirmação explícita (RN-11, RF-20)
   const [modalReiniciarAberto, setModalReiniciarAberto] = useState(false);
   const [modalEncerrarAberto, setModalEncerrarAberto] = useState(false);
 
@@ -39,7 +38,6 @@ export const ControlesSessao: React.FC<ControlesSessaoProps> = ({
 
   return (
     <div className="controles-sessao-container" aria-label="Controles da Sessão de Foco">
-      {/* Caso inativo ou concluído: exibe botão principal de Iniciar */}
       {!ehSessaoAtiva && (
         <button
           type="button"
@@ -54,10 +52,8 @@ export const ControlesSessao: React.FC<ControlesSessaoProps> = ({
         </button>
       )}
 
-      {/* Caso em andamento ou pausada: exibe controles completos */}
       {ehSessaoAtiva && (
         <div className="controles-botoes-grupo">
-          {/* Botão Pausar / Retomar */}
           {status === 'emAndamento' ? (
             <button
               type="button"
@@ -85,7 +81,6 @@ export const ControlesSessao: React.FC<ControlesSessaoProps> = ({
             </button>
           )}
 
-          {/* Botão Pular Fase (RN-03, RF-08, UC06) */}
           <button
             type="button"
             className="btn btn-secundario btn-pular"
@@ -100,7 +95,6 @@ export const ControlesSessao: React.FC<ControlesSessaoProps> = ({
             Pular Fase
           </button>
 
-          {/* Botão Reiniciar Ciclos (RN-04, RN-11, RF-09, UC07) */}
           <button
             type="button"
             className="btn btn-secundario btn-reiniciar"
@@ -115,7 +109,6 @@ export const ControlesSessao: React.FC<ControlesSessaoProps> = ({
             Reiniciar Ciclos
           </button>
 
-          {/* Botão Encerrar Sessão (RN-11, RF-10, UC08) */}
           <button
             type="button"
             className="btn btn-perigo btn-encerrar"
@@ -131,7 +124,6 @@ export const ControlesSessao: React.FC<ControlesSessaoProps> = ({
         </div>
       )}
 
-      {/* Modal de Confirmação para Reiniciar Ciclos (RN-11, UC07) */}
       <ModalConfirmacao
         aberto={modalReiniciarAberto}
         titulo="Reiniciar Ciclos"
@@ -143,7 +135,6 @@ export const ControlesSessao: React.FC<ControlesSessaoProps> = ({
         aoCancelar={() => setModalReiniciarAberto(false)}
       />
 
-      {/* Modal de Confirmação para Encerrar Sessão (RN-11, UC08) */}
       <ModalConfirmacao
         aberto={modalEncerrarAberto}
         titulo="Encerrar Sessão"

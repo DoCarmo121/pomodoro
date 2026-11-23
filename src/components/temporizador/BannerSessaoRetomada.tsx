@@ -22,7 +22,6 @@ export const BannerSessaoRetomada: React.FC<BannerSessaoRetomadaProps> = ({
   aoContinuar,
   aoDescartar,
 }) => {
-  // Modal de confirmação explícita para descarte da sessão retomada (RN-11, UC11)
   const [modalConfirmarDescarte, setModalConfirmarDescarte] = useState(false);
 
   if (!aberto) return null;
@@ -64,7 +63,6 @@ export const BannerSessaoRetomada: React.FC<BannerSessaoRetomadaProps> = ({
         </div>
 
         <div className="banner-retomada-acoes">
-          {/* Botão de Descartar Sessão (RF-13, UC11) */}
           <button
             type="button"
             className="btn btn-sm btn-secundario btn-descartar"
@@ -78,7 +76,6 @@ export const BannerSessaoRetomada: React.FC<BannerSessaoRetomadaProps> = ({
             Descartar
           </button>
 
-          {/* Botão de Prosseguir */}
           <button
             type="button"
             className="btn btn-sm btn-primario"
@@ -90,7 +87,6 @@ export const BannerSessaoRetomada: React.FC<BannerSessaoRetomadaProps> = ({
         </div>
       </div>
 
-      {/* Modal de confirmação explícita para descarte da sessão (RN-11, UC11) */}
       <ModalConfirmacao
         aberto={modalConfirmarDescarte}
         titulo="Descartar Sessão Retomada"

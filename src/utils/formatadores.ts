@@ -1,9 +1,5 @@
 import { FaseSessao, EstadoTarefa, PrioridadeTarefa } from '../types';
 
-/**
- * Formata um valor em milissegundos para o formato clássico MM:SS.
- * Arredonda para cima (Math.ceil) para evitar exibir 00:00 enquanto ainda resta fração de segundo.
- */
 export function formatarTempo(ms: number): string {
   if (ms <= 0) {
     return '00:00';
@@ -19,9 +15,6 @@ export function formatarTempo(ms: number): string {
   return `${mm}:${ss}`;
 }
 
-/**
- * Formata minutos para exibição amigável em texto (ex: "25 min" ou "1h 30min").
- */
 export function formatarDuracaoMinutos(minutos: number): string {
   if (minutos < 60) {
     return `${minutos} min`;
@@ -37,9 +30,6 @@ export function formatarDuracaoMinutos(minutos: number): string {
   return `${horas}h ${minRestantes}min`;
 }
 
-/**
- * Retorna o nome amigável e legível em português da fase Pomodoro.
- */
 export function obterNomeFase(fase: FaseSessao): string {
   switch (fase) {
     case 'foco':
@@ -51,9 +41,6 @@ export function obterNomeFase(fase: FaseSessao): string {
   }
 }
 
-/**
- * Retorna o rótulo semântico em português para o estado da tarefa.
- */
 export function obterNomeEstadoTarefa(estado: EstadoTarefa): string {
   switch (estado) {
     case 'backlog':
@@ -69,9 +56,6 @@ export function obterNomeEstadoTarefa(estado: EstadoTarefa): string {
   }
 }
 
-/**
- * Retorna o rótulo em português para a prioridade da tarefa.
- */
 export function obterNomePrioridadeTarefa(prioridade: PrioridadeTarefa): string {
   switch (prioridade) {
     case 'baixa':
@@ -82,4 +66,3 @@ export function obterNomePrioridadeTarefa(prioridade: PrioridadeTarefa): string 
       return 'Alta';
   }
 }
-

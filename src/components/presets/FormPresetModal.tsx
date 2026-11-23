@@ -36,7 +36,6 @@ export const FormPresetModal: React.FC<FormPresetModalProps> = ({
     aoFecharRef.current = aoFechar;
   }, [aoFechar]);
 
-  // Inicializa o formulário com dados do preset em edição ou valores padrão
   useEffect(() => {
     if (presetEmEdicao) {
       setNome(presetEmEdicao.nome);
@@ -54,7 +53,6 @@ export const FormPresetModal: React.FC<FormPresetModalProps> = ({
     setErros({});
   }, [presetEmEdicao, aberto]);
 
-  // Foco inicial executado apenas UMA vez ao abrir o modal
   useEffect(() => {
     if (!aberto) return;
 
@@ -65,7 +63,6 @@ export const FormPresetModal: React.FC<FormPresetModalProps> = ({
     return () => clearTimeout(timer);
   }, [aberto]);
 
-  // Controle de teclado (Escape e Tab trap - RNF-07)
   useEffect(() => {
     if (!aberto) return;
 
@@ -163,7 +160,6 @@ export const FormPresetModal: React.FC<FormPresetModalProps> = ({
         </div>
 
         <form onSubmit={handleSubmit} noValidate>
-          {/* Nome do Preset (VR-01) */}
           <div className="form-grupo">
             <label htmlFor="preset-nome" className="form-label">
               Nome do Temporizador <span className="campo-obrigatorio">*</span>
@@ -193,7 +189,6 @@ export const FormPresetModal: React.FC<FormPresetModalProps> = ({
           </div>
 
           <div className="form-linha">
-            {/* Tempo de Foco (VR-02) */}
             <div className="form-grupo form-metade">
               <label htmlFor="preset-foco" className="form-label">
                 Foco (minutos) <span className="campo-obrigatorio">*</span>
@@ -221,7 +216,6 @@ export const FormPresetModal: React.FC<FormPresetModalProps> = ({
               </div>
             </div>
 
-            {/* Tempo de Pausa Curta (VR-03) */}
             <div className="form-grupo form-metade">
               <label htmlFor="preset-pausa-curta" className="form-label">
                 Pausa Curta (min) <span className="campo-obrigatorio">*</span>
@@ -251,7 +245,6 @@ export const FormPresetModal: React.FC<FormPresetModalProps> = ({
           </div>
 
           <div className="form-linha">
-            {/* Ciclos antes da Pausa Longa (VR-04) */}
             <div className="form-grupo form-metade">
               <label htmlFor="preset-ciclos" className="form-label">
                 Ciclos até Pausa Longa <span className="campo-obrigatorio">*</span>
@@ -279,7 +272,6 @@ export const FormPresetModal: React.FC<FormPresetModalProps> = ({
               </div>
             </div>
 
-            {/* Tempo de Pausa Longa (VR-05) */}
             <div className="form-grupo form-metade">
               <label htmlFor="preset-pausa-longa" className="form-label">
                 Pausa Longa (min) <span className="campo-obrigatorio">*</span>

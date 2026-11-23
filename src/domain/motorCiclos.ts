@@ -4,10 +4,6 @@ import {
   FaseSessao,
 } from '../types';
 
-/**
- * Retorna a duração em milissegundos para uma determinada fase
- * com base no snapshot do preset ativo.
- */
 export function obterDuracaoFaseMs(
   snapshot: TemporizadorPersonalizado,
   fase: FaseSessao
@@ -22,15 +18,10 @@ export function obterDuracaoFaseMs(
   }
 }
 
-/**
- * Cria uma nova instância de SessaoAtiva a partir de um preset selecionado.
- * Segue UC04 e RN-05 (criação de snapshot imutável do preset).
- */
 export function iniciarNovaSessao(
   preset: TemporizadorPersonalizado,
   agora: number = Date.now()
 ): SessaoAtiva {
-  // Snapshot imutável dos parâmetros do preset no momento de início (RN-05)
   const snapshotPreset: TemporizadorPersonalizado = { ...preset };
   const duracaoFocoMs = obterDuracaoFaseMs(snapshotPreset, 'foco');
 
@@ -52,10 +43,6 @@ export function iniciarNovaSessao(
   };
 }
 
-/**
- * Pausa uma sessão em andamento, preservando o tempo restante.
- * Segue UC05 e RN-06.
- */
 export function pausarSessao(
   sessao: SessaoAtiva,
   agora: number = Date.now()
@@ -75,10 +62,6 @@ export function pausarSessao(
   };
 }
 
-/**
- * Retoma uma sessão pausada, recalculando o timestamp de fim a partir do momento atual.
- * Segue UC05.
- */
 export function retomarSessao(
   sessao: SessaoAtiva,
   agora: number = Date.now()
@@ -100,10 +83,6 @@ export function retomarSessao(
   };
 }
 
-/**
- * Determina a próxima fase prevista e o próximo ciclo após o término NATURAL
- * da fase atual (o tempo se esgotou normalmente).
- */
 export function calcularTransicaoNatural(
   faseAtual: FaseSessao,
   cicloAtual: number,
@@ -114,24 +93,22 @@ export function calcularTransicaoNatural(
   sessaoConcluida: boolean;
 } {
   if (faseAtual === 'foco') {
-    // Se o ciclo atual atingiu a meta para pausa longa
     if (cicloAtual >= snapshot.ciclosAntesPausaLonga) {
       return {
         proximaFase: 'pausaLonga',
-        proximoCiclo: cicloAtual, // Ciclo não incrementa ao ir para a pausa
+        proximoCiclo: cicloAtual,
         sessaoConcluida: false,
       };
     } else {
       return {
         proximaFase: 'pausaCurta',
-        proximoCiclo: cicloAtual, // Ciclo não incrementa ao ir para a pausa
+        proximoCiclo: cicloAtual,
         sessaoConcluida: false,
       };
     }
   }
 
   if (faseAtual === 'pausaCurta') {
-    // Conclusão natural da pausa curta: avança para o próximo foco e incrementa o ciclo
     return {
       proximaFase: 'foco',
       proximoCiclo: cicloAtual + 1,
@@ -139,7 +116,6 @@ export function calcularTransicaoNatural(
     };
   }
 
-  // Se faseAtual === 'pausaLonga': o último ciclo do preset foi completado
   return {
     proximaFase: 'pausaLonga',
     proximoCiclo: cicloAtual,
@@ -147,10 +123,6 @@ export function calcularTransicaoNatural(
   };
 }
 
-/**
- * Avança a sessão quando o cronômetro atinge o fim de forma natural.
- * Se atingir a conclusão de todos os ciclos, marca status como concluída.
- */
 export function avancarFaseConcluida(
   sessao: SessaoAtiva,
   momentoTermino: number = Date.now()
@@ -187,12 +159,6 @@ export function avancarFaseConcluida(
   };
 }
 
-/**
- * Pula a fase atual manualmente pelo usuário.
- * Segue UC06 e RN-03:
- * "Pular uma fase de foco não incrementa a contagem de ciclos;
- *  pular uma fase de pausa também não incrementa."
- */
 export function pularFase(
   sessao: SessaoAtiva,
   agora: number = Date.now()
@@ -201,17 +167,14 @@ export function pularFase(
   let sessaoConcluida = false;
 
   if (sessao.faseAtual === 'foco') {
-    // Pula para a pausa prevista, mantendo o ciclo atual
     if (sessao.cicloAtual >= sessao.snapshotPreset.ciclosAntesPausaLonga) {
       proximaFase = 'pausaLonga';
     } else {
       proximaFase = 'pausaCurta';
     }
   } else if (sessao.faseAtual === 'pausaCurta') {
-    // Pula pausa curta -> vai para foco SEM incrementar ciclos (RN-03)
     proximaFase = 'foco';
   } else {
-    // Estava na pausa longa e pulou -> encerra a sessão
     proximaFase = 'pausaLonga';
     sessaoConcluida = true;
   }
@@ -229,13 +192,11 @@ export function pularFase(
     proximaFase
   );
 
-  // Se a sessão estava pausada, ao pular ela continua pausada com o tempo total da nova fase
   const estavaPausada = sessao.status === 'pausada';
 
   return {
     ...sessao,
     faseAtual: proximaFase,
-    // cicloAtual mantido inalterado por RN-03
     cicloAtual: sessao.cicloAtual,
     status: estavaPausada ? 'pausada' : 'emAndamento',
     inicioFaseEm: agora,
@@ -246,12 +207,6 @@ export function pularFase(
   };
 }
 
-/**
- * Reinicia todos os ciclos da sessão ativa.
- * Segue UC07 e RN-04:
- * "Reiniciar ciclos zera a contagem de ciclos e retorna ao primeiro ciclo de foco,
- *  mantendo o preset ativo."
- */
 export function reiniciarCiclos(
   sessao: SessaoAtiva,
   agora: number = Date.now()
@@ -262,7 +217,7 @@ export function reiniciarCiclos(
   return {
     ...sessao,
     faseAtual: 'foco',
-    cicloAtual: 1, // Volta a 1 conforme UC07
+    cicloAtual: 1,
     status: estavaPausada ? 'pausada' : 'emAndamento',
     inicioFaseEm: agora,
     fimFasePrevistoEm: agora + duracaoFocoMs,
@@ -272,24 +227,14 @@ export function reiniciarCiclos(
   };
 }
 
-/**
- * Recalcula a sessão ativa ao reabrir a aplicação após inatividade / fechamento do navegador.
- * Segue UC10, RN-06, RN-07, RN-08 e R-05:
- * - Se estava pausada: preserva exatamente o tempo restante (RN-06).
- * - Se estava em andamento: compara o timestamp atual com o fim previsto da fase.
- *   Se venceu, avança sequencialmente pelas fases previstas até achar uma fase vigente
- *   ou concluir a sessão se todas vencerem (RN-07, RN-08).
- */
 export function recalcularSessaoAposInatividade(
   sessao: SessaoAtiva,
   agora: number = Date.now()
 ): SessaoAtiva {
-  // Se já estava concluída, não há o que recalcular
   if (sessao.status === 'concluida') {
     return sessao;
   }
 
-  // RN-06: Sessão pausada não sofre avanço temporal automático
   if (sessao.status === 'pausada') {
     return {
       ...sessao,
@@ -297,7 +242,6 @@ export function recalcularSessaoAposInatividade(
     };
   }
 
-  // Caso 1: A fase atual ainda não terminou
   if (agora < sessao.fimFasePrevistoEm) {
     return {
       ...sessao,
@@ -305,8 +249,6 @@ export function recalcularSessaoAposInatividade(
     };
   }
 
-  // Caso 2: A fase atual venceu enquanto fechado (RN-07).
-  // Itera pelas fases de forma sequencial utilizando os timestamps reais acumulados (R-05).
   let faseIter = sessao.faseAtual;
   let cicloIter = sessao.cicloAtual;
   let tempoFimIter = sessao.fimFasePrevistoEm;
@@ -315,7 +257,6 @@ export function recalcularSessaoAposInatividade(
   while (tempoFimIter <= agora) {
     const transicao = calcularTransicaoNatural(faseIter, cicloIter, snapshot);
 
-    // RN-08: Se todas as fases previstas vencerem durante o período fechado, encerra com status concluído
     if (transicao.sessaoConcluida) {
       return {
         ...sessao,
@@ -332,7 +273,6 @@ export function recalcularSessaoAposInatividade(
     const duracaoMs = obterDuracaoFaseMs(snapshot, faseIter);
     const novoFim = tempoFimIter + duracaoMs;
 
-    // Se o novo fim ultrapassa agora, encontramos a fase vigente!
     if (novoFim > agora) {
       return {
         ...sessao,
@@ -360,9 +300,6 @@ export function recalcularSessaoAposInatividade(
   };
 }
 
-/**
- * Calcula os milissegundos restantes para a fase atual em tempo real.
- */
 export function calcularTempoRestanteMs(
   sessao: SessaoAtiva,
   agora: number = Date.now()
@@ -375,4 +312,3 @@ export function calcularTempoRestanteMs(
   }
   return Math.max(0, sessao.fimFasePrevistoEm - agora);
 }
-

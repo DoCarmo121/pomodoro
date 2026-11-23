@@ -12,11 +12,6 @@ export interface ModalConfirmacaoProps {
   aoCancelar: () => void;
 }
 
-/**
- * Componente de Modal de Confirmação Reutilizável (CP 9.1, RF-20, RN-11, RNF-07).
- * Utilizado para confirmação explícita em exclusões e operações destrutivas.
- * Possui acessibilidade total por teclado (Escape para fechar, foco inicial e navegação Tab em ciclo).
- */
 export const ModalConfirmacao: React.FC<ModalConfirmacaoProps> = ({
   aberto,
   titulo,
@@ -35,11 +30,9 @@ export const ModalConfirmacao: React.FC<ModalConfirmacaoProps> = ({
     aoCancelarRef.current = aoCancelar;
   }, [aoCancelar]);
 
-  // Foco inicial executado apenas UMA vez ao abrir o modal
   useEffect(() => {
     if (!aberto) return;
 
-    // Foca o botão de cancelar por padrão para evitar confirmações acidentais
     const timer = setTimeout(() => {
       botaoCancelarRef.current?.focus();
     }, 50);
@@ -47,7 +40,6 @@ export const ModalConfirmacao: React.FC<ModalConfirmacaoProps> = ({
     return () => clearTimeout(timer);
   }, [aberto]);
 
-  // Navegação e fechamento por teclado (RNF-07)
   useEffect(() => {
     if (!aberto) return;
 
@@ -57,7 +49,6 @@ export const ModalConfirmacao: React.FC<ModalConfirmacaoProps> = ({
         return;
       }
 
-      // Ciclo de foco (Focus Trap) dentro do modal
       if (e.key === 'Tab' && conteudoRef.current) {
         const elementosFocaveis = conteudoRef.current.querySelectorAll<HTMLElement>(
           'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
@@ -97,7 +88,6 @@ export const ModalConfirmacao: React.FC<ModalConfirmacaoProps> = ({
       aria-labelledby="modal-confirmacao-titulo"
       aria-describedby="modal-confirmacao-mensagem"
       onClick={(e) => {
-        // Clicar fora da caixa fecha o modal
         if (e.target === e.currentTarget) {
           aoCancelar();
         }

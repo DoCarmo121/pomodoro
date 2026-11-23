@@ -4,11 +4,6 @@ import { CHAVE_STORAGE_SESSAO_ATIVA } from './chaves';
 const FASES_VALIDAS: FaseSessao[] = ['foco', 'pausaCurta', 'pausaLonga'];
 const STATUS_VALIDOS: StatusSessao[] = ['emAndamento', 'pausada', 'concluida'];
 
-/**
- * Validação de integridade e consistência da SessaoAtiva (R-03).
- * Garante que dados corrompidos ou incompletos no localStorage
- * não quebrem o ciclo de execução do temporizador.
- */
 export function ehEstruturaSessaoValida(obj: unknown): obj is SessaoAtiva {
   if (typeof obj !== 'object' || obj === null) return false;
   const s = obj as Record<string, unknown>;
@@ -43,10 +38,6 @@ export function ehEstruturaSessaoValida(obj: unknown): obj is SessaoAtiva {
   return pausadaEmValido && tempoRestanteValido;
 }
 
-/**
- * Recupera a sessão ativa do localStorage.
- * Se estiver ausente ou corrompida (R-03), limpa e retorna null.
- */
 export function obterSessaoAtiva(): SessaoAtiva | null {
   try {
     const raw = localStorage.getItem(CHAVE_STORAGE_SESSAO_ATIVA);
@@ -69,9 +60,6 @@ export function obterSessaoAtiva(): SessaoAtiva | null {
   }
 }
 
-/**
- * Persiste o estado atual da sessão ativa no localStorage.
- */
 export function salvarSessaoAtiva(sessao: SessaoAtiva): void {
   try {
     localStorage.setItem(CHAVE_STORAGE_SESSAO_ATIVA, JSON.stringify(sessao));
@@ -81,9 +69,6 @@ export function salvarSessaoAtiva(sessao: SessaoAtiva): void {
   }
 }
 
-/**
- * Remove a sessão ativa do localStorage (ao encerrar, concluir ou descartar sessão).
- */
 export function limparSessaoAtiva(): void {
   try {
     localStorage.removeItem(CHAVE_STORAGE_SESSAO_ATIVA);
@@ -91,4 +76,3 @@ export function limparSessaoAtiva(): void {
     console.error('Erro ao remover sessão ativa do localStorage:', erro);
   }
 }
-

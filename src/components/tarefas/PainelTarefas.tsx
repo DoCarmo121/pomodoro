@@ -23,10 +23,8 @@ export const PainelTarefas: React.FC<PainelTarefasProps> = ({
   const [modalFormAberto, setModalFormAberto] = useState(false);
   const [tarefaEmEdicao, setTarefaEmEdicao] = useState<Tarefa | null>(null);
 
-  // Estado para exclusão com confirmação obrigatória (RN-11, RF-17, UC14)
   const [tarefaParaExcluir, setTarefaParaExcluir] = useState<Tarefa | null>(null);
 
-  // Ordenação fixa aplicada automaticamente por RN-10
   const tarefasOrdenadas = ordenarTarefas(tarefas);
 
   const abrirModalCriar = () => {
@@ -126,7 +124,6 @@ export const PainelTarefas: React.FC<PainelTarefasProps> = ({
         )}
       </section>
 
-      {/* Modal de Criação / Edição de Tarefas (UC12, UC13) */}
       <FormTarefaModal
         aberto={modalFormAberto}
         tarefaEmEdicao={tarefaEmEdicao}
@@ -134,7 +131,6 @@ export const PainelTarefas: React.FC<PainelTarefasProps> = ({
         aoFechar={fecharModalForm}
       />
 
-      {/* Modal de Confirmação Obrigatória para Exclusão de Tarefa (RN-11, RF-17, UC14) */}
       <ModalConfirmacao
         aberto={tarefaParaExcluir !== null}
         titulo="Excluir Tarefa"
